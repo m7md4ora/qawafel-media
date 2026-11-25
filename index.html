@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>أخبار القوافل — القوافل الطبية</title>
-<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
 <style>
 :root{
@@ -94,6 +94,10 @@ footer{text-align:center; color:var(--muted); font-size:.8rem; padding:6px 0 26p
         <option value="__other__">فرع تاني</option>
       </select>
       <input id="branchOther" placeholder="اكتب اسم الفرع" style="display:none; margin-top:8px;">
+
+      <label>اسم مسلّم الخبر <span class="req">*</span></label>
+      <input id="submitter" placeholder="اكتب اسمك" required>
+      <div class="hint">اسم الشخص اللي بيسلّم الخبر بنفسه</div>
 
       <label>نوع الحدث <span class="req">*</span></label>
       <select id="etype" required>
@@ -207,9 +211,9 @@ async function uploadFile(id, f, onPart){
 $('f').addEventListener('submit', async (e) => {
   e.preventDefault(); clearErr();
   const br = branch.value === '__other__' ? branchOther.value.trim() : branch.value;
-  const etype = $('etype').value, convoy = $('convoy').value.trim(), place = $('place').value.trim();
+  const subm = $('submitter').value.trim(), etype = $('etype').value, convoy = $('convoy').value.trim(), place = $('place').value.trim();
   const date = $('date').value, ben = $('ben').value, notes = $('notes').value.trim();
-  if(!br || !etype || !convoy || !place || !date || ben === ''){ showErr('املأ كل الخانات المطلوبة'); return; }
+  if(!br || !subm || !etype || !convoy || !place || !date || ben === ''){ showErr('املأ كل الخانات المطلوبة'); return; }
   if(files.length === 0){ showErr('ارفع صورة واحدة على الأقل'); return; }
 
   submitBtn.disabled = true; submitBtn.textContent = 'جاري الرفع…';
@@ -225,11 +229,14 @@ $('f').addEventListener('submit', async (e) => {
     const res = await fetch(`${SUPA_URL}/rest/v1/media_submissions`, {
       method:'POST',
       headers:{ apikey:SUPA_KEY, Authorization:`Bearer ${SUPA_KEY}`, 'Content-Type':'application/json' },
-      body: JSON.stringify({ branch: br, event_type: etype, convoy_name: convoy, place, convoy_date: date,
+      body: JSON.stringify({ branch: br, submitter_name: subm, event_type: etype, convoy_name: convoy, place, convoy_date: date,
         beneficiaries: parseInt(ben,10), notes: notes || null, files: metas })
     });
     if(!res.ok){ const t = await res.text(); throw new Error('save failed: '+t.slice(0,120)); }
     tick();
+    $('note').style.display = 'none';
+    $('doneTitle').textContent = 'شكراً فرع ' + br + '!';
+    $('doneMsg').textContent = 'شغلكم بيوصّل الخير لكل الناس، ومستنيين منكم الأقوى دايماً';
     $('note').style.display = 'none';
     $('doneTitle').textContent = 'شكراً فرع ' + br + '!';
     $('doneMsg').textContent = 'شغلكم بيوصّل الخير لكل الناس، ومستنيين منكم الأقوى دايماً';
@@ -251,7 +258,7 @@ $('f').addEventListener('submit', async (e) => {
 });
 
 $('again').addEventListener('click', () => {
-  $('done').style.display = 'none'; $('note').style.display = 'block'; $('note').style.display = 'block'; $('note').style.display = 'block';
+  $('done').style.display = 'none'; $('note').style.display = 'block'; $('note').style.display = 'block'; $('note').style.display = 'block'; $('note').style.display = 'block';
   const f = $('f'); f.reset(); f.style.display = 'block';
   files = []; renderFiles(); progBar.style.width='0'; prog.style.display='none';
   branchOther.style.display = 'none';
