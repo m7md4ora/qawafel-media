@@ -54,7 +54,7 @@ textarea{resize:vertical; min-height:76px;}
 .hint{font-size:.8rem; color:var(--muted); margin-top:5px;}
 .dropzone{
   border:2px dashed var(--sky); border-radius:14px; background:#ecf7fd;
-  padding:26px 14px; text-align:center; cursor:pointer; transition:background .15s;
+  padding:26px 14px; text-align:center; cursor:pointer; transition:background .2s, border-color .2s;
 }
 .dropzone:active,.dropzone.over{background:#d9eefb;}
 .dropzone .ic{font-size:1.9rem;}
@@ -93,7 +93,7 @@ footer{text-align:center; color:var(--muted); font-size:.8rem; padding:6px 0 26p
 <header class="hero">
   <div class="logo-badge"><img src="logo-activity.png" alt="إنقاذ حياة مريض — قوافل طبية"></div>
   <h1>أخبار القوافل الطبية</h1>
-  <p>نموذج موحد لكل الفروع — ابعت خبر قافلتك خلال ٢٤ ساعة</p>
+  <p>نموذج موحد لكل الفروع — ابعت خبر الحدث خلال ٢٤ ساعة</p>
 </header>
 
 <div class="wrap">
@@ -115,13 +115,21 @@ footer{text-align:center; color:var(--muted); font-size:.8rem; padding:6px 0 26p
       </select>
       <input id="branchOther" placeholder="اكتب اسم الفرع" style="display:none; margin-top:8px;">
 
-      <label>اسم القافلة <span class="req">*</span></label>
-      <input id="convoy" placeholder="مثال: قافلة غيث الطبية" required>
+      <label>نوع الحدث <span class="req">*</span></label>
+      <select id="etype" required>
+        <option value="">— اختار النوع —</option>
+        <option>قافلة</option>
+        <option>كامب</option>
+        <option>إيفنت</option>
+      </select>
+
+      <label>اسم الحدث <span class="req">*</span></label>
+      <input id="convoy" placeholder="مثال: غيث الطبية" required>
 
       <label>المكان <span class="req">*</span></label>
       <input id="place" placeholder="مثال: قرية كفر … — المنوفية" required>
 
-      <label>تاريخ القافلة <span class="req">*</span></label>
+      <label>تاريخ الحدث <span class="req">*</span></label>
       <input id="date" type="date" required>
 
       <label>عدد المستفيدين <span class="req">*</span></label>
@@ -219,9 +227,9 @@ async function uploadFile(id, f, onPart){
 $('f').addEventListener('submit', async (e) => {
   e.preventDefault(); clearErr();
   const br = branch.value === '__other__' ? branchOther.value.trim() : branch.value;
-  const convoy = $('convoy').value.trim(), place = $('place').value.trim();
+  const etype = $('etype').value, convoy = $('convoy').value.trim(), place = $('place').value.trim();
   const date = $('date').value, ben = $('ben').value, notes = $('notes').value.trim();
-  if(!br || !convoy || !place || !date || ben === ''){ showErr('املأ كل الخانات المطلوبة'); return; }
+  if(!br || !etype || !convoy || !place || !date || ben === ''){ showErr('املأ كل الخانات المطلوبة'); return; }
   if(files.length === 0){ showErr('ارفع صورة واحدة على الأقل'); return; }
 
   submitBtn.disabled = true; submitBtn.textContent = 'جاري الرفع…';
@@ -237,7 +245,7 @@ $('f').addEventListener('submit', async (e) => {
     const res = await fetch(`${SUPA_URL}/rest/v1/media_submissions`, {
       method:'POST',
       headers:{ apikey:SUPA_KEY, Authorization:`Bearer ${SUPA_KEY}`, 'Content-Type':'application/json' },
-      body: JSON.stringify({ branch: br, convoy_name: convoy, place, convoy_date: date,
+      body: JSON.stringify({ branch: br, event_type: etype, convoy_name: convoy, place, convoy_date: date,
         beneficiaries: parseInt(ben,10), notes: notes || null, files: metas })
     });
     if(!res.ok){ const t = await res.text(); throw new Error('save failed: '+t.slice(0,120)); }
