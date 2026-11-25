@@ -8,81 +8,63 @@
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
 <style>
 :root{
-  --sky:#0da0de; --sky-deep:#075a8c; --sky-mid:#0b7cc0;
-  --bg:#f2f9fd; --card:#ffffff; --text:#0e2a3d; --muted:#54738a;
-  --border:#d3e9f5; --ok:#1e8e4f; --red:#d32f2f;
+  --ink:#171233; --violet:#7c3aed; --violet-deep:#4c1d95; --fuchsia:#c026d3;
+  --amber:#fbbf24; --amber-deep:#f59e0b;
+  --bg:#f4f3fb; --card:#ffffff; --text:#231c42; --muted:#6d6789;
+  --border:#e3def3; --ok:#16a34a; --red:#dc2626;
 }
 *{box-sizing:border-box; margin:0; padding:0; font-family:'Cairo',sans-serif;}
 body{background:var(--bg); color:var(--text); min-height:100vh;}
 .hero{
-  background:linear-gradient(165deg,var(--sky-deep),var(--sky-mid) 55%,var(--sky));
-  color:#fff; padding:34px 20px 58px; text-align:center; position:relative; overflow:hidden;
+  background:
+    radial-gradient(600px 260px at 88% -8%, rgba(192,38,211,.30), transparent 65%),
+    radial-gradient(500px 300px at 8% 108%, rgba(192,38,211,.25), transparent 60%),
+    linear-gradient(160deg,#171233 0%, var(--violet-deep) 48%, var(--violet) 100%);
+  color:#fff; padding:40px 20px 64px; text-align:center; position:relative; overflow:hidden;
 }
-.hero::after{content:''; position:absolute; inset:auto 0 0 0; height:6px; background:rgba(255,255,255,.85);}
-.hero .logo-badge{
-  display:inline-flex; align-items:center; justify-content:center;
-  background:#fff; border-radius:20px; padding:12px 22px; margin:0 auto 12px;
-  box-shadow:0 6px 18px rgba(4,50,80,.35);
-  animation:pop .7s cubic-bezier(.2,.9,.3,1.2) both;
-}
-.hero .logo-badge img{height:72px; display:block;}
-.hero h1{font-size:1.45rem; font-weight:900; letter-spacing:.2px; animation:rise .6s .1s ease both;}
-.hero p{opacity:.92; font-size:.95rem; margin-top:6px; animation:rise .6s .2s ease both;}
-@keyframes pop{from{transform:scale(.4); opacity:0} to{transform:scale(1); opacity:1}}
+.hero::after{content:''; position:absolute; inset:auto 0 0 0; height:5px; background:linear-gradient(90deg,var(--fuchsia),#e9d5ff,var(--fuchsia));}
+.deco{position:absolute; inset:0; pointer-events:none;}
+.deco svg{position:absolute; color:#fff; opacity:.13; animation:floaty 9s ease-in-out infinite alternate;}
+.deco .d1{top:10%; right:6%; width:46px;}
+.deco .d2{top:16%; left:6%; width:36px; animation-duration:11s; animation-delay:-3s;}
+.deco .d3{bottom:26%; right:11%; width:32px; animation-duration:10s; animation-delay:-5s;}
+.deco .d4{bottom:30%; left:9%; width:42px; animation-duration:12s; animation-delay:-1.5s;}
+@keyframes floaty{from{transform:translateY(-8px) rotate(-4deg)} to{transform:translateY(10px) rotate(5deg)}}
+.logos{display:flex; align-items:center; justify-content:center; gap:16px; margin-bottom:16px; position:relative; animation:fadeDown .8s .05s both;}
+.logos img{height:58px; display:block; filter:drop-shadow(0 4px 12px rgba(0,0,0,.45));}
+.logos .sep{width:1.5px; height:44px; background:linear-gradient(180deg,transparent,rgba(255,255,255,.65),transparent);}
+@keyframes fadeDown{from{opacity:0; transform:translateY(-14px)} to{opacity:1; transform:none}}
+.hero h1{font-size:1.5rem; font-weight:900; letter-spacing:.2px; position:relative; animation:rise .6s .15s ease both; text-shadow:0 2px 14px rgba(0,0,0,.3);}
+.hero .subtitle{color:#e9d5ff; font-weight:700; font-size:.98rem; margin-top:4px; position:relative; animation:rise .6s .25s ease both;}
+.hero p{opacity:.88; font-size:.9rem; margin-top:8px; position:relative; animation:rise .6s .35s ease both;}
 @keyframes rise{from{transform:translateY(14px); opacity:0} to{transform:none; opacity:1}}
-.wrap{max-width:560px; margin:-34px auto 40px; padding:0 16px; position:relative; z-index:1;}
-.card{
-  background:var(--card); border:1px solid var(--border); border-radius:18px;
-  padding:22px 18px; box-shadow:0 10px 30px rgba(11,92,173,.09);
-  animation:rise .5s .25s ease both;
-}
-.note{
-  background:#e6f5fd; border:1px solid #b8e2f6; color:#075a8c;
-  border-radius:12px; padding:10px 14px; font-size:.88rem; font-weight:600; margin-bottom:18px;
-}
+@keyframes pop{from{transform:scale(.4); opacity:0} to{transform:scale(1); opacity:1}}
+
+.wrap{max-width:560px; margin:-36px auto 40px; padding:0 16px; position:relative; z-index:1;}
+.card{background:var(--card); border:1px solid var(--border); border-radius:20px; padding:22px 18px; box-shadow:0 14px 34px rgba(76,29,149,.13); animation:rise .5s .3s ease both;}
+.note{background:#f1ecff; border:1px solid #ddd0f8; color:#4c1d95; border-radius:12px; padding:10px 14px; font-size:.88rem; font-weight:600; margin-bottom:18px;}
 label{display:block; font-weight:700; font-size:.95rem; margin:16px 0 7px;}
 label .req{color:var(--red);}
-input,select,textarea{
-  width:100%; padding:13px 14px; border:1.5px solid var(--border); border-radius:12px;
-  font-size:1rem; font-family:inherit; background:#fbfdff; color:var(--text);
-  transition:border-color .15s, box-shadow .15s;
-}
-input:focus,select:focus,textarea:focus{
-  outline:none; border-color:var(--sky); box-shadow:0 0 0 3px rgba(13,160,222,.15); background:#fff;
-}
+input,select,textarea{width:100%; padding:13px 14px; border:1.5px solid var(--border); border-radius:12px; font-size:1rem; font-family:inherit; background:#fbfaff; color:var(--text); transition:border-color .15s, box-shadow .15s;}
+input:focus,select:focus,textarea:focus{outline:none; border-color:var(--violet); box-shadow:0 0 0 3px rgba(124,58,237,.16); background:#fff;}
 textarea{resize:vertical; min-height:76px;}
 .hint{font-size:.8rem; color:var(--muted); margin-top:5px;}
-.dropzone{
-  border:2px dashed var(--sky); border-radius:14px; background:#ecf7fd;
-  padding:26px 14px; text-align:center; cursor:pointer; transition:background .2s, border-color .2s;
-}
-.dropzone:active,.dropzone.over{background:#d9eefb;}
-.dropzone .ic{font-size:1.9rem;}
-.dropzone b{color:var(--sky-deep);}
+.dropzone{border:2px dashed var(--violet); border-radius:14px; background:#f7f4ff; padding:24px 14px; text-align:center; cursor:pointer; transition:background .2s, border-color .2s;}
+.dropzone:active,.dropzone.over{background:#efe9ff;}
+.dropzone .ic svg{width:42px; color:var(--violet);}
+.dropzone b{color:var(--violet-deep);}
 .files{margin-top:12px; display:flex; flex-direction:column; gap:8px;}
-.file-item{
-  display:flex; align-items:center; gap:10px; background:#f7fafd;
-  border:1px solid var(--border); border-radius:10px; padding:8px 12px; font-size:.87rem;
-}
+.file-item{display:flex; align-items:center; gap:10px; background:#f8f7fd; border:1px solid var(--border); border-radius:10px; padding:8px 12px; font-size:.87rem;}
 .file-item .nm{flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
 .file-item .rm{color:var(--red); font-weight:700; cursor:pointer; border:none; background:none; font-size:1rem;}
-.progress{height:8px; background:#e3ecf7; border-radius:99px; overflow:hidden; margin-top:16px; display:none;}
-.progress i{display:block; height:100%; width:0; background:linear-gradient(90deg,var(--sky),var(--sky-deep)); transition:width .2s;}
-.btn{
-  width:100%; margin-top:20px; padding:15px; border:none; border-radius:14px;
-  background:linear-gradient(135deg,var(--sky),var(--sky-deep)); color:#fff;
-  font-size:1.08rem; font-weight:900; font-family:inherit; cursor:pointer;
-  box-shadow:0 6px 16px rgba(13,160,222,.35); transition:transform .1s, opacity .2s;
-}
+.progress{height:8px; background:#e9e4f6; border-radius:99px; overflow:hidden; margin-top:16px; display:none;}
+.progress i{display:block; height:100%; width:0; background:linear-gradient(90deg,var(--violet),var(--fuchsia)); transition:width .2s;}
+.btn{width:100%; margin-top:20px; padding:15px; border:none; border-radius:14px; background:linear-gradient(135deg,var(--violet),var(--fuchsia)); color:#fff; font-size:1.08rem; font-weight:900; font-family:inherit; cursor:pointer; box-shadow:0 6px 18px rgba(124,58,237,.35); transition:transform .1s, opacity .2s;}
 .btn:active{transform:scale(.98);}
 .btn:disabled{opacity:.55; cursor:default;}
 .err{color:var(--red); font-size:.85rem; font-weight:700; margin-top:10px; display:none;}
 .done{display:none; text-align:center; padding:14px 4px;}
-.done .badge{
-  width:74px; height:74px; margin:6px auto 14px; border-radius:50%;
-  background:#e8f6ee; color:var(--ok); font-size:2.2rem;
-  display:flex; align-items:center; justify-content:center; animation:pop .5s both;
-}
+.done .badge{width:74px; height:74px; margin:6px auto 14px; border-radius:50%; background:#e8f6ee; color:var(--ok); font-size:2.2rem; display:flex; align-items:center; justify-content:center; animation:pop .5s both;}
 .done h2{color:var(--ok); font-size:1.25rem; margin-bottom:8px;}
 .done p{color:var(--muted); font-size:.93rem;}
 .done .btn{margin-top:22px;}
@@ -91,14 +73,15 @@ footer{text-align:center; color:var(--muted); font-size:.8rem; padding:6px 0 26p
 </head>
 <body>
 <header class="hero">
-  <div class="logo-badge"><img src="logo-activity.png" alt="إنقاذ حياة مريض — قوافل طبية"></div>
+  <div class="deco"><svg class="d1" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h3l2-3h6l2 3h3a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1z"/><circle cx="12" cy="13" r="4"/></svg> <svg class="d2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg> <svg class="d3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M10 8.5l6 3.5-6 3.5z" fill="currentColor" stroke="none"/></svg> <svg class="d4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M7 5v14M17 5v14M3 9h4M3 15h4M17 9h4M17 15h4"/></svg></div>
+  <div class="logos"><img src="logo-ihna-white.png" alt="إحنا"><span class="sep"></span><img src="logo-convoys-white.png" alt="رسالة — قوافل طبية"></div>
   <h1>أخبار القوافل الطبية</h1>
-  <p>نموذج موحد لكل الفروع — ابعت خبر الحدث خلال ٢٤ ساعة</p>
+  <div class="subtitle">لجنة الميديا المركزية</div>
 </header>
 
 <div class="wrap">
   <div class="card">
-    <div class="note">الصور والفيديوهات تترفع <b>من غير لوجو</b> — اللوجو بيتحط من الميديا المركزية قبل النشر.</div>
+    <div class="note" id="note">الصور والفيديوهات تترفع <b>من غير لوجو</b> — اللوجو بيتحط من الميديا المركزية قبل النشر.</div>
 
     <form id="f" novalidate>
       <label>الفرع <span class="req">*</span></label>
@@ -140,7 +123,7 @@ footer{text-align:center; color:var(--muted); font-size:.8rem; padding:6px 0 26p
 
       <label>الصور والفيديوهات <span class="req">*</span></label>
       <div class="dropzone" id="dz">
-        <div class="ic">📷</div>
+        <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h3l2-3h6l2 3h3a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1z"/><circle cx="12" cy="13" r="4"/></svg></div>
         <div><b>اضغط هنا لاختيار الصور والفيديوهات</b></div>
         <div class="hint">لحد ١٠ ملفات — كل ملف لحد ٥٠ ميجا — من غير لوجو</div>
       </div>
@@ -154,12 +137,12 @@ footer{text-align:center; color:var(--muted); font-size:.8rem; padding:6px 0 26p
 
     <div class="done" id="done">
       <div class="badge">✓</div>
-      <h2>وصل الخبر، شكراً!</h2>
-      <p>الميديا المركزية هتراجع المادة وتجهزها للنشر.</p>
+      <h2 id="doneTitle">شكراً!</h2>
+      <p id="doneMsg"></p>
       <button class="btn" id="again" type="button">إرسال خبر تاني</button>
     </div>
   </div>
-  <footer>القوافل الطبية — الميديا المركزية</footer>
+  <footer>نشاط القوافل الطبية - لجنة الميديا المركزية</footer>
 </div>
 
 <script>
@@ -250,6 +233,9 @@ $('f').addEventListener('submit', async (e) => {
     });
     if(!res.ok){ const t = await res.text(); throw new Error('save failed: '+t.slice(0,120)); }
     tick();
+    $('note').style.display = 'none';
+    $('doneTitle').textContent = 'شكراً فرع ' + br + '!';
+    $('doneMsg').textContent = 'شغلكم بيوصّل الخير لكل الناس، ومستنيين منكم الأقوى دايماً';
     $('f').style.display = 'none';
     $('done').style.display = 'block';
     window.scrollTo({top:0, behavior:'smooth'});
@@ -262,7 +248,7 @@ $('f').addEventListener('submit', async (e) => {
 });
 
 $('again').addEventListener('click', () => {
-  $('done').style.display = 'none';
+  $('done').style.display = 'none'; $('note').style.display = 'block';
   const f = $('f'); f.reset(); f.style.display = 'block';
   files = []; renderFiles(); progBar.style.width='0'; prog.style.display='none';
   branchOther.style.display = 'none';

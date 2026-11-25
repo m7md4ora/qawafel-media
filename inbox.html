@@ -8,55 +8,78 @@
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
 <style>
 :root{
-  --sky:#0da0de; --sky-deep:#075a8c; --sky-mid:#0b7cc0;
-  --bg:#f2f9fd; --card:#ffffff; --text:#0e2a3d; --muted:#54738a; --border:#d3e9f5;
+  --ink:#171233; --violet:#7c3aed; --violet-deep:#4c1d95; --fuchsia:#c026d3;
+  --amber:#fbbf24; --amber-deep:#f59e0b;
+  --bg:#f4f3fb; --card:#ffffff; --text:#231c42; --muted:#6d6789;
+  --border:#e3def3; --ok:#16a34a; --red:#dc2626;
 }
 *{box-sizing:border-box; margin:0; padding:0; font-family:'Cairo',sans-serif;}
 body{background:var(--bg); color:var(--text); min-height:100vh;}
 .hero{
-  background:linear-gradient(165deg,var(--sky-deep),var(--sky-mid) 55%,var(--sky));
-  color:#fff; padding:26px 20px 46px; text-align:center; position:relative;
+  background:
+    radial-gradient(600px 260px at 88% -8%, rgba(192,38,211,.30), transparent 65%),
+    radial-gradient(500px 300px at 8% 108%, rgba(192,38,211,.25), transparent 60%),
+    linear-gradient(160deg,#171233 0%, var(--violet-deep) 48%, var(--violet) 100%);
+  color:#fff; padding:40px 20px 64px; text-align:center; position:relative; overflow:hidden;
 }
-.hero::after{content:''; position:absolute; inset:auto 0 0 0; height:6px; background:rgba(255,255,255,.85);}
-.hero h1{font-size:1.3rem; font-weight:900;}
-.hero .logo-badge{display:inline-flex; align-items:center; justify-content:center; background:#fff; border-radius:18px; padding:10px 20px; margin:0 auto 10px; box-shadow:0 6px 18px rgba(4,50,80,.35);}
-.hero .logo-badge img{height:60px; display:block;}
-.hero p{opacity:.9; font-size:.88rem; margin-top:4px;}
-.wrap{max-width:640px; margin:-28px auto 40px; padding:0 16px; position:relative; z-index:1;}
-.card{background:var(--card); border:1px solid var(--border); border-radius:18px; padding:20px 16px; box-shadow:0 10px 30px rgba(11,92,173,.09);}
+.hero::after{content:''; position:absolute; inset:auto 0 0 0; height:5px; background:linear-gradient(90deg,var(--fuchsia),#e9d5ff,var(--fuchsia));}
+.deco{position:absolute; inset:0; pointer-events:none;}
+.deco svg{position:absolute; color:#fff; opacity:.13; animation:floaty 9s ease-in-out infinite alternate;}
+.deco .d1{top:10%; right:6%; width:46px;}
+.deco .d2{top:16%; left:6%; width:36px; animation-duration:11s; animation-delay:-3s;}
+.deco .d3{bottom:26%; right:11%; width:32px; animation-duration:10s; animation-delay:-5s;}
+.deco .d4{bottom:30%; left:9%; width:42px; animation-duration:12s; animation-delay:-1.5s;}
+@keyframes floaty{from{transform:translateY(-8px) rotate(-4deg)} to{transform:translateY(10px) rotate(5deg)}}
+.logos{display:flex; align-items:center; justify-content:center; gap:16px; margin-bottom:16px; position:relative; animation:fadeDown .8s .05s both;}
+.logos img{height:58px; display:block; filter:drop-shadow(0 4px 12px rgba(0,0,0,.45));}
+.logos .sep{width:1.5px; height:44px; background:linear-gradient(180deg,transparent,rgba(255,255,255,.65),transparent);}
+@keyframes fadeDown{from{opacity:0; transform:translateY(-14px)} to{opacity:1; transform:none}}
+.hero h1{font-size:1.5rem; font-weight:900; letter-spacing:.2px; position:relative; animation:rise .6s .15s ease both; text-shadow:0 2px 14px rgba(0,0,0,.3);}
+.hero .subtitle{color:#e9d5ff; font-weight:700; font-size:.98rem; margin-top:4px; position:relative; animation:rise .6s .25s ease both;}
+.hero p{opacity:.88; font-size:.9rem; margin-top:8px; position:relative; animation:rise .6s .35s ease both;}
+@keyframes rise{from{transform:translateY(14px); opacity:0} to{transform:none; opacity:1}}
+@keyframes pop{from{transform:scale(.4); opacity:0} to{transform:scale(1); opacity:1}}
+
+.hero{padding:32px 20px 52px;}
+.logos img{height:50px;}
+.hero h1{font-size:1.35rem;}
+.wrap{max-width:640px; margin:-30px auto 40px; padding:0 16px; position:relative; z-index:1;}
+.card{background:var(--card); border:1px solid var(--border); border-radius:20px; padding:20px 16px; box-shadow:0 14px 34px rgba(76,29,149,.13); animation:rise .5s .3s ease both;}
 label{display:block; font-weight:700; font-size:.95rem; margin-bottom:8px;}
-input{width:100%; padding:13px 14px; border:1.5px solid var(--border); border-radius:12px; font-size:1rem; font-family:inherit; background:#fbfdff;}
-input:focus{outline:none; border-color:var(--sky); box-shadow:0 0 0 3px rgba(13,160,222,.15); background:#fff;}
-.btn{width:100%; margin-top:14px; padding:14px; border:none; border-radius:14px; background:linear-gradient(135deg,var(--sky),var(--sky-deep)); color:#fff; font-size:1.05rem; font-weight:900; font-family:inherit; cursor:pointer;}
+input{width:100%; padding:13px 14px; border:1.5px solid var(--border); border-radius:12px; font-size:1rem; font-family:inherit; background:#fbfaff; color:var(--text);}
+input:focus{outline:none; border-color:var(--violet); box-shadow:0 0 0 3px rgba(124,58,237,.16); background:#fff;}
+.btn{width:100%; margin-top:14px; padding:14px; border:none; border-radius:14px; background:linear-gradient(135deg,var(--violet),var(--fuchsia)); color:#fff; font-size:1.05rem; font-weight:900; font-family:inherit; cursor:pointer; box-shadow:0 6px 18px rgba(124,58,237,.35);}
 .btn:active{transform:scale(.98);}
-.err{color:#d32f2f; font-size:.85rem; font-weight:700; margin-top:10px; display:none;}
+.err{color:var(--red); font-size:.85rem; font-weight:700; margin-top:10px; display:none;}
 .stats{display:none; gap:10px; margin-bottom:16px;}
 .stats.show{display:flex;}
-.stat{flex:1; background:#ecf7fd; border:1px solid var(--border); border-radius:12px; padding:10px; text-align:center;}
-.stat b{display:block; color:var(--sky-deep); font-size:1.3rem; font-weight:900;}
+.stat{flex:1; background:#f3efff; border:1px solid var(--border); border-radius:12px; padding:10px; text-align:center;}
+.stat b{display:block; color:var(--violet-deep); font-size:1.3rem; font-weight:900;}
 .stat span{font-size:.78rem; color:var(--muted);}
-.sub{background:var(--card); border:1px solid var(--border); border-radius:16px; padding:16px; margin-bottom:14px; box-shadow:0 4px 14px rgba(11,92,173,.06);}
-.sub .top{display:flex; justify-content:space-between; align-items:center; gap:8px;}
-.badge{background:linear-gradient(135deg,var(--sky),var(--sky-deep)); color:#fff; border-radius:99px; padding:3px 12px; font-size:.8rem; font-weight:700; white-space:nowrap;}
+.sub{background:var(--card); border:1px solid var(--border); border-radius:16px; padding:16px; margin-bottom:14px; box-shadow:0 4px 14px rgba(76,29,149,.08); animation:rise .45s ease both;}
+.sub .top{display:flex; justify-content:space-between; align-items:center; gap:8px; flex-wrap:wrap;}
+.badge{background:linear-gradient(135deg,var(--violet),var(--violet-deep)); color:#fff; border-radius:99px; padding:3px 12px; font-size:.8rem; font-weight:700; white-space:nowrap;}
 .when{color:var(--muted); font-size:.78rem;}
 .sub h3{font-size:1.08rem; margin:10px 0 4px; font-weight:900;}
 .meta{color:var(--muted); font-size:.88rem; line-height:1.7;}
 .meta b{color:var(--text);}
 .notes{background:#fffbea; border:1px solid #efe3b8; border-radius:10px; padding:8px 12px; font-size:.86rem; margin-top:8px;}
 .thumbs{display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin-top:12px;}
-.thumbs a{display:block; border-radius:10px; overflow:hidden; border:1px solid var(--border); aspect-ratio:1; background:#eef3fa; position:relative;}
+.thumbs a{display:block; border-radius:10px; overflow:hidden; border:1px solid var(--border); aspect-ratio:1; background:#f0ecf9; position:relative;}
 .thumbs img{width:100%; height:100%; object-fit:cover; display:block;}
-.thumbs .vid{display:flex; align-items:center; justify-content:center; font-size:1.6rem; color:var(--sky-deep); height:100%;}
+.thumbs .vid{display:flex; align-items:center; justify-content:center; font-size:1.6rem; color:var(--violet-deep); height:100%;}
 .empty{text-align:center; color:var(--muted); padding:30px 0; display:none;}
-.refresh{margin-top:4px; background:none; border:1.5px solid var(--sky); color:var(--sky-deep); border-radius:12px; padding:10px; width:100%; font-family:inherit; font-weight:700; cursor:pointer;}
+.refresh{margin-top:4px; background:none; border:1.5px solid var(--violet); color:var(--violet-deep); border-radius:12px; padding:10px; width:100%; font-family:inherit; font-weight:700; cursor:pointer;}
 footer{text-align:center; color:var(--muted); font-size:.8rem; padding:6px 0 26px;}
 </style>
 </head>
 <body>
 <header class="hero">
-  <div class="logo-badge"><img src="logo-activity.png" alt="إنقاذ حياة مريض — قوافل طبية"></div>
+  <div class="deco"><svg class="d1" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h3l2-3h6l2 3h3a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1z"/><circle cx="12" cy="13" r="4"/></svg> <svg class="d2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg> <svg class="d3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M10 8.5l6 3.5-6 3.5z" fill="currentColor" stroke="none"/></svg> <svg class="d4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M7 5v14M17 5v14M3 9h4M3 15h4M17 9h4M17 15h4"/></svg></div>
+  <div class="logos"><img src="logo-ihna-white.png" alt="إحنا"><span class="sep"></span><img src="logo-convoys-white.png" alt="رسالة — قوافل طبية"></div>
   <h1>صندوق أخبار الفروع</h1>
-  <p>خاص بالميديا المركزية</p>
+  <div class="subtitle">لجنة الميديا المركزية</div>
+  <p>الأخبار الواصلة من كل الفروع</p>
 </header>
 <div class="wrap">
   <div class="card" id="gate">
@@ -76,7 +99,7 @@ footer{text-align:center; color:var(--muted); font-size:.8rem; padding:6px 0 26p
     <div class="empty" id="empty">مفيش أخبار لسه.</div>
     <button class="refresh" id="refresh">تحديث</button>
   </div>
-  <footer>القوافل الطبية — الميديا المركزية</footer>
+  <footer>نشاط القوافل الطبية - لجنة الميديا المركزية</footer>
 </div>
 
 <script>
@@ -116,7 +139,7 @@ function render(rows){
       return `<a href="${u}" target="_blank" rel="noopener">${isVid ? '<span class="vid">🎬</span>' : `<img loading="lazy" src="${u}" alt="">`}</a>`;
     }).join('');
     div.innerHTML = `
-      <div class="top"><span class="badge">${r.branch}</span>${r.event_type ? `<span class="badge" style="background:#075A8C">${r.event_type}</span>` : ''}<span class="when">${fmtWhen(r.created_at)}</span></div>
+      <div class="top"><span class="badge">${r.branch}</span>${r.event_type ? `<span class="badge" style="background:linear-gradient(135deg,#c026d3,#7c3aed)">${r.event_type}</span>` : ''}<span class="when">${fmtWhen(r.created_at)}</span></div>
       <h3>${r.convoy_name}</h3>
       <div class="meta">📍 <b>${r.place}</b><br>🗓️ ${fmtDate(r.convoy_date)}<br>👥 المستفيدين: <b>${(r.beneficiaries??'—').toLocaleString? r.beneficiaries.toLocaleString('ar-EG') : r.beneficiaries}</b></div>
       ${r.notes ? `<div class="notes">${r.notes}</div>` : ''}
