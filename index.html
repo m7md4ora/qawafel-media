@@ -126,7 +126,7 @@ footer{text-align:center; color:var(--muted); font-size:.8rem; padding:6px 0 26p
       <div class="dropzone" id="dz">
         <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h3l2-3h6l2 3h3a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1z"/><circle cx="12" cy="13" r="4"/></svg></div>
         <div><b>اضغط هنا لاختيار الصور والفيديوهات</b></div>
-        <div class="hint">لحد ١٠ ملفات — كل ملف لحد ٥٠ ميجا — من غير لوجو</div>
+        <div class="hint">لحد ١٠ ملفات — بالجودة الأصلية — من غير لوجو</div>
       </div>
       <input id="pick" type="file" accept="image/*,video/*" multiple style="display:none">
       <div class="files" id="fileList"></div>
@@ -151,7 +151,7 @@ footer{text-align:center; color:var(--muted); font-size:.8rem; padding:6px 0 26p
 const SUPA_URL = 'https://oybknupfuaveaznzrdqi.supabase.co';
 const SUPA_KEY = 'sb_publishable_csnN7BXoLEk-0s8CYCuRJg_hRYfQrbw';
 const BUCKET = 'media-uploads';
-const MAX_FILES = 10, MAX_MB = 50;
+const MAX_FILES = 10, MAX_MB = 4096;
 
 const $ = id => document.getElementById(id);
 const branch = $('branch');
@@ -165,7 +165,6 @@ pick.addEventListener('change', () => addFiles(pick.files));
 function addFiles(list){
   for(const f of list){
     if(files.length >= MAX_FILES){ showErr('الحد الأقصى ١٠ ملفات'); break; }
-    if(f.size > MAX_MB*1024*1024){ showErr('فيه ملف أكبر من ٥٠ ميجا: ' + f.name); continue; }
     files.push(f);
   }
   pick.value = '';
@@ -193,28 +192,59 @@ function uid(){
 }
 function safeName(n){ return n.replace(/[^\w.\-\u0600-\u06FF]/g,'_').slice(-80); }
 
-// رفع ملف واحد بنفس البايتات الأصلية (من غير ضغط) مع تقدم بالبايت وإعادة محاولة
-function putFile(path, f, onBytes){
+// الرفع مباشرة إلى Drive بالجودة الأصلية: الصفحة بتطلب رابط رفع من الـ Web App وبعدين بتبعت الملف على أجزاء ٨ ميجا
+const WEBAPP = 'https://script.google.com/macros/s/AKfycbybGKtgJAP0huG8hQqSspeVJSLPLbVoEq1cCO7gT8a7CJVtlf3xxLag1z2g9aeTTuJg/exec';
+const WKEY = 'qm-cLZv08ChnbrQQi8tqSwHhVW4yis1';
+const CHUNK = 8 * 1024 * 1024;
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+async function api(payload){
+  let last;
+  for(let a = 0; a < 4; a++){
+    try{
+      const r = await fetch(WEBAPP, { method:'POST', body: JSON.stringify({ key: WKEY, ...payload }) });
+      const j = await r.json();
+      if(j.ok) return j;
+      last = new Error(j.error || 'api');
+      if(/forbidden|bad /.test(j.error || '')) throw last;
+    }catch(e){ last = e; if(/forbidden|bad /.test(String(e.message))) throw e; }
+    await sleep(1500 * (a + 1));
+  }
+  throw last;
+}
+function putChunk(url, blob, start, end, total, onBytes){
   return new Promise((resolve, reject) => {
     const x = new XMLHttpRequest();
-    x.open('POST', `${SUPA_URL}/storage/v1/object/${BUCKET}/${path}`);
-    x.setRequestHeader('apikey', SUPA_KEY);
-    x.setRequestHeader('Authorization', `Bearer ${SUPA_KEY}`);
-    x.setRequestHeader('Content-Type', f.type || 'application/octet-stream');
-    x.setRequestHeader('x-upsert', 'false');
-    x.upload.onprogress = e => { if(e.lengthComputable) onBytes(e.loaded); };
-    x.onload = () => ((x.status >= 200 && x.status < 300) || x.status === 409 || /Duplicate|KeyAlreadyExists/.test(String(x.responseText))) ? resolve() : reject(new Error('upload failed ' + x.status + ' ' + String(x.responseText).slice(0,100)));
+    x.open('PUT', url);
+    x.setRequestHeader('Content-Range', `bytes ${start}-${end - 1}/${total}`);
+    x.upload.onprogress = e => { if(e.lengthComputable) onBytes(start + e.loaded); };
+    x.onload = () => {
+      if(x.status === 308) resolve(null);
+      else if(x.status === 200 || x.status === 201){ try{ resolve(JSON.parse(x.responseText).id); }catch(_){ reject(new Error('bad response')); } }
+      else reject(new Error('chunk failed ' + x.status));
+    };
     x.onerror = () => reject(new Error('network error'));
-    x.ontimeout = () => reject(new Error('timeout'));
-    x.send(f);
+    x.send(blob.slice(start, end));
   });
 }
-async function uploadFile(id, f, onBytes){
-  const path = `submissions/${id}/${safeName(f.name)}`;
+async function uploadFile(meta, f, i, onBytes){
   let last;
   for(let attempt = 0; attempt < 3; attempt++){
-    try{ onBytes(0); await putFile(path, f, onBytes); onBytes(f.size); return { path, name: f.name, type: f.type }; }
-    catch(e){ last = e; await new Promise(r => setTimeout(r, 1200 * (attempt + 1))); }
+    try{
+      onBytes(0);
+      const s = await api({ action:'init', ...meta, index:i, filename:f.name, mime:f.type || 'application/octet-stream', size:f.size });
+      let pos = 0, id = null;
+      while(pos < f.size){
+        const end = Math.min(pos + CHUNK, f.size);
+        let ok = false, ce;
+        for(let c = 0; c < 3 && !ok; c++){
+          try{ id = await putChunk(s.url, f, pos, end, f.size, onBytes); ok = true; }catch(e){ ce = e; await sleep(1500 * (c + 1)); }
+        }
+        if(!ok) throw ce;
+        pos = end; onBytes(pos);
+      }
+      if(!id) throw new Error('no file id');
+      return id;
+    }catch(e){ last = e; await sleep(2000 * (attempt + 1)); }
   }
   throw last;
 }
@@ -259,17 +289,12 @@ $('f').addEventListener('submit', async (e) => {
   try{ if(navigator.wakeLock) lock = await navigator.wakeLock.request('screen'); }catch(_){}
 
   try{
-    const metas = await runPool(files, async (f, i) => {
-      const m = await uploadFile(id, f, n => { sent[i] = n; paint(); });
-      fin[i] = true; sent[i] = f.size; paint(); return m;
+    const meta = { branch: br, event_type: etype, convoy_name: convoy, convoy_date: date };
+    const ids = await runPool(files, async (f, i) => {
+      const fid = await uploadFile(meta, f, i, n => { sent[i] = n; paint(); });
+      fin[i] = true; sent[i] = f.size; paint(); return fid;
     }, 3);
-    const res = await fetch(`${SUPA_URL}/rest/v1/media_submissions`, {
-      method:'POST',
-      headers:{ apikey:SUPA_KEY, Authorization:`Bearer ${SUPA_KEY}`, 'Content-Type':'application/json' },
-      body: JSON.stringify({ branch: br, submitter_name: subm, event_type: etype, convoy_name: convoy, place, convoy_date: date,
-        beneficiaries: parseInt(ben,10), notes: notes || null, files: metas })
-    });
-    if(!res.ok){ const t = await res.text(); throw new Error('save failed: '+t.slice(0,120)); }
+    await api({ action:'finish', sid:id, ...meta, place, beneficiaries: parseInt(ben,10), notes: notes || null, submitter_name: subm, fileIds: ids });
     progBar.style.width = '100%';
     $('note').style.display = 'none';
     $('doneTitle').textContent = 'شكراً فرع ' + br + '!';

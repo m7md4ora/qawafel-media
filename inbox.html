@@ -141,6 +141,7 @@ function render(rows){
       <h3>${r.convoy_name}</h3>
       <div class="meta">✍️ مسلّم الخبر: <b>${r.submitter_name||'—'}</b><br>📍 <b>${r.place}</b><br>🗓️ ${fmtDate(r.convoy_date)}<br>👥 المستفيدين: <b>${(r.beneficiaries??'—').toLocaleString? r.beneficiaries.toLocaleString('ar-EG') : r.beneficiaries}</b></div>
       ${r.notes ? `<div class="notes">${r.notes}</div>` : ''}
+      ${r.drive_url ? `<a class="drv" href="${r.drive_url}" target="_blank" rel="noopener" style="display:inline-block;margin-top:10px;padding:10px 16px;border-radius:12px;background:linear-gradient(135deg,#7c3aed,#c026d3);color:#fff;font-weight:700;text-decoration:none">📁 فتح الصور والفيديوهات في Drive</a>` : ''}
       <div class="thumbs">${thumbs}</div>`;
     list.appendChild(div);
   }
