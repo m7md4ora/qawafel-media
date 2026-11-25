@@ -132,6 +132,7 @@ footer{text-align:center; color:var(--muted); font-size:.8rem; padding:6px 0 26p
       <div class="files" id="fileList"></div>
 
       <div class="progress" id="prog"><i id="progBar"></i></div>
+      <div id="upmsg" style="display:none; margin-top:10px; text-align:center; font-size:14px; line-height:1.7;"><b>جاري الرفع، متقفلش الصفحة ومتطفيش الشاشة</b><br><span id="upstat"></span></div>
       <div class="err" id="err"></div>
       <button class="btn" id="submit" type="submit">إرسال الخبر</button>
     </form>
@@ -192,17 +193,44 @@ function uid(){
 }
 function safeName(n){ return n.replace(/[^\w.\-\u0600-\u06FF]/g,'_').slice(-80); }
 
-async function uploadFile(id, f, onPart){
-  const path = `submissions/${id}/${safeName(f.name)}`;
-  const res = await fetch(`${SUPA_URL}/storage/v1/object/${BUCKET}/${path}`, {
-    method:'POST',
-    headers:{ apikey:SUPA_KEY, Authorization:`Bearer ${SUPA_KEY}`, 'Content-Type': f.type || 'application/octet-stream', 'x-upsert':'false' },
-    body: f
+// رفع ملف واحد بنفس البايتات الأصلية (من غير ضغط) مع تقدم بالبايت وإعادة محاولة
+function putFile(path, f, onBytes){
+  return new Promise((resolve, reject) => {
+    const x = new XMLHttpRequest();
+    x.open('POST', `${SUPA_URL}/storage/v1/object/${BUCKET}/${path}`);
+    x.setRequestHeader('apikey', SUPA_KEY);
+    x.setRequestHeader('Authorization', `Bearer ${SUPA_KEY}`);
+    x.setRequestHeader('Content-Type', f.type || 'application/octet-stream');
+    x.setRequestHeader('x-upsert', 'false');
+    x.upload.onprogress = e => { if(e.lengthComputable) onBytes(e.loaded); };
+    x.onload = () => ((x.status >= 200 && x.status < 300) || x.status === 409 || /Duplicate|KeyAlreadyExists/.test(String(x.responseText))) ? resolve() : reject(new Error('upload failed ' + x.status + ' ' + String(x.responseText).slice(0,100)));
+    x.onerror = () => reject(new Error('network error'));
+    x.ontimeout = () => reject(new Error('timeout'));
+    x.send(f);
   });
-  if(!res.ok){ const t = await res.text(); throw new Error('upload failed: '+t.slice(0,120)); }
-  onPart();
-  return { path, name: f.name, type: f.type };
 }
+async function uploadFile(id, f, onBytes){
+  const path = `submissions/${id}/${safeName(f.name)}`;
+  let last;
+  for(let attempt = 0; attempt < 3; attempt++){
+    try{ onBytes(0); await putFile(path, f, onBytes); onBytes(f.size); return { path, name: f.name, type: f.type }; }
+    catch(e){ last = e; await new Promise(r => setTimeout(r, 1200 * (attempt + 1))); }
+  }
+  throw last;
+}
+
+// يشغّل الرفع بالتوازي (٣ ملفات في نفس الوقت)
+async function runPool(items, worker, limit){
+  const out = new Array(items.length); let next = 0;
+  const runners = Array.from({length: Math.min(limit, items.length)}, async () => {
+    while(true){ const i = next++; if(i >= items.length) return; out[i] = await worker(items[i], i); }
+  });
+  await Promise.all(runners);
+  return out;
+}
+
+let uploading = false;
+window.addEventListener('beforeunload', e => { if(uploading){ e.preventDefault(); e.returnValue = ''; } });
 
 $('f').addEventListener('submit', async (e) => {
   e.preventDefault(); clearErr();
@@ -212,16 +240,29 @@ $('f').addEventListener('submit', async (e) => {
   if(!br || !subm || !etype || !convoy || !place || !date || ben === ''){ showErr('املأ كل الخانات المطلوبة'); return; }
   if(files.length === 0){ showErr('ارفع صورة واحدة على الأقل'); return; }
 
-  submitBtn.disabled = true; submitBtn.textContent = 'جاري الرفع…';
-  prog.style.display = 'block';
+  submitBtn.disabled = true; submitBtn.textContent = 'جاري الرفع… متقفلش الصفحة';
+  prog.style.display = 'block'; $('upmsg').style.display = 'block';
   const id = uid();
-  let doneParts = 0;
-  const total = files.length + 1;
-  const tick = () => { doneParts++; progBar.style.width = Math.round(doneParts/total*100)+'%'; };
+  const sent = files.map(() => 0);
+  const totalBytes = files.reduce((s, f) => s + f.size, 0) || 1;
+  const fin = files.map(() => false);
+  let shown = 0;
+  const paint = () => {
+    const done = sent.reduce((s, v) => s + v, 0);
+    const pct = Math.max(shown, Math.min(99, Math.round(done / totalBytes * 100))); shown = pct;
+    progBar.style.width = pct + '%';
+    $('upstat').textContent = 'اترفع ' + fin.filter(Boolean).length + ' من ' + files.length + ' ملف — ' + pct + '%';
+  };
+  paint();
+  uploading = true;
+  let lock = null;
+  try{ if(navigator.wakeLock) lock = await navigator.wakeLock.request('screen'); }catch(_){}
 
   try{
-    const metas = [];
-    for(const f of files){ metas.push(await uploadFile(id, f, tick)); }
+    const metas = await runPool(files, async (f, i) => {
+      const m = await uploadFile(id, f, n => { sent[i] = n; paint(); });
+      fin[i] = true; sent[i] = f.size; paint(); return m;
+    }, 3);
     const res = await fetch(`${SUPA_URL}/rest/v1/media_submissions`, {
       method:'POST',
       headers:{ apikey:SUPA_KEY, Authorization:`Bearer ${SUPA_KEY}`, 'Content-Type':'application/json' },
@@ -229,22 +270,7 @@ $('f').addEventListener('submit', async (e) => {
         beneficiaries: parseInt(ben,10), notes: notes || null, files: metas })
     });
     if(!res.ok){ const t = await res.text(); throw new Error('save failed: '+t.slice(0,120)); }
-    tick();
-    $('note').style.display = 'none';
-    $('doneTitle').textContent = 'شكراً فرع ' + br + '!';
-    $('doneMsg').textContent = 'شغلكم بيوصّل الخير لكل الناس، ومستنيين منكم الأقوى دايماً';
-    $('note').style.display = 'none';
-    $('doneTitle').textContent = 'شكراً فرع ' + br + '!';
-    $('doneMsg').textContent = 'شغلكم بيوصّل الخير لكل الناس، ومستنيين منكم الأقوى دايماً';
-    $('note').style.display = 'none';
-    $('doneTitle').textContent = 'شكراً فرع ' + br + '!';
-    $('doneMsg').textContent = 'شغلكم بيوصّل الخير لكل الناس، ومستنيين منكم الأقوى دايماً';
-    $('note').style.display = 'none';
-    $('doneTitle').textContent = 'شكراً فرع ' + br + '!';
-    $('doneMsg').textContent = 'شغلكم بيوصّل الخير لكل الناس، ومستنيين منكم الأقوى دايماً';
-    $('note').style.display = 'none';
-    $('doneTitle').textContent = 'شكراً فرع ' + br + '!';
-    $('doneMsg').textContent = 'شغلكم بيوصّل الخير لكل الناس، ومستنيين منكم الأقوى دايماً';
+    progBar.style.width = '100%';
     $('note').style.display = 'none';
     $('doneTitle').textContent = 'شكراً فرع ' + br + '!';
     $('doneMsg').textContent = 'شغلكم بيوصّل الخير لكل الناس، ومستنيين منكم الأقوى دايماً';
@@ -255,6 +281,8 @@ $('f').addEventListener('submit', async (e) => {
     showErr('حصلت مشكلة في الإرسال. جرب تاني، ولو تكررت كلم مسؤول الميديا.');
     console.error(ex);
   }finally{
+    uploading = false; try{ if(lock) lock.release(); }catch(_){}
+    $('upmsg').style.display = 'none';
     submitBtn.disabled = false; submitBtn.textContent = 'إرسال الخبر';
   }
 });
@@ -262,7 +290,7 @@ $('f').addEventListener('submit', async (e) => {
 $('again').addEventListener('click', () => {
   $('done').style.display = 'none'; $('note').style.display = 'block';
   const f = $('f'); f.reset(); f.style.display = 'block';
-  files = []; renderFiles(); progBar.style.width='0'; prog.style.display='none';
+  files = []; renderFiles(); progBar.style.width='0'; prog.style.display='none'; $('upmsg').style.display='none';
   window.scrollTo({top:0, behavior:'smooth'});
 });
 </script>
