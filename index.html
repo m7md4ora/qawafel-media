@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>أخبار القوافل — القوافل الطبية</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
 <style>
 :root{
@@ -18,7 +18,6 @@ body{background:var(--bg); color:var(--text); min-height:100vh;}
 .hero{
   background:
     radial-gradient(600px 260px at 88% -8%, rgba(192,38,211,.30), transparent 65%),
-    radial-gradient(500px 300px at 8% 108%, rgba(192,38,211,.25), transparent 60%),
     linear-gradient(160deg,#171233 0%, var(--violet-deep) 48%, var(--violet) 100%);
   color:#fff; padding:40px 20px 64px; text-align:center; position:relative; overflow:hidden;
 }
@@ -29,19 +28,17 @@ body{background:var(--bg); color:var(--text); min-height:100vh;}
 .deco .d2{top:16%; left:6%; width:36px;}
 .deco .d3{bottom:26%; right:11%; width:32px;}
 .deco .d4{bottom:30%; left:9%; width:42px;}
-.logos{display:flex; align-items:center; justify-content:center; gap:16px; margin-bottom:16px; position:relative; animation:fadeDown .8s .05s both;}
+.logos{display:flex; align-items:center; justify-content:center; gap:16px; margin-bottom:16px; position:relative;}
 .logos img{height:58px; display:block;}
 .logos .sep{width:1.5px; height:44px; background:linear-gradient(180deg,transparent,rgba(255,255,255,.65),transparent);}
-@keyframes fadeDown{from{opacity:0; transform:translateY(-14px)} to{opacity:1; transform:none}}
-.hero h1{font-size:1.5rem; font-weight:900; letter-spacing:.2px; position:relative; animation:rise .6s .15s ease both; text-shadow:0 2px 14px rgba(0,0,0,.3);}
-.hero .subtitle{color:#e9d5ff; font-weight:700; font-size:.98rem; margin-top:4px; position:relative; animation:rise .6s .25s ease both;}
-.hero p{opacity:.88; font-size:.9rem; margin-top:8px; position:relative; animation:rise .6s .35s ease both;}
-@keyframes rise{from{transform:translateY(14px); opacity:0} to{transform:none; opacity:1}}
+.hero h1{font-size:1.5rem; font-weight:900; letter-spacing:.2px; position:relative;}
+.hero .subtitle{color:#e9d5ff; font-weight:700; font-size:.98rem; margin-top:4px; position:relative;}
+.hero p{opacity:.88; font-size:.9rem; margin-top:8px; position:relative;}
 @keyframes pop{from{transform:scale(.4); opacity:0} to{transform:scale(1); opacity:1}}
 @media (prefers-reduced-motion: reduce){ *,*::before,*::after{animation:none !important; transition:none !important;} }
 
 .wrap{max-width:560px; margin:-36px auto 40px; padding:0 16px; position:relative; z-index:1;}
-.card{background:var(--card); border:1px solid var(--border); border-radius:20px; padding:22px 18px; box-shadow:0 14px 34px rgba(76,29,149,.13); animation:rise .5s .3s ease both;}
+.card{background:var(--card); border:1px solid var(--border); border-radius:20px; padding:22px 18px; box-shadow:0 4px 14px rgba(76,29,149,.12);}
 .note{background:#f1ecff; border:1px solid #ddd0f8; color:#4c1d95; border-radius:12px; padding:10px 14px; font-size:.88rem; font-weight:600; margin-bottom:18px;}
 label{display:block; font-weight:700; font-size:.95rem; margin:16px 0 7px;}
 label .req{color:var(--red);}
@@ -59,7 +56,7 @@ textarea{resize:vertical; min-height:76px;}
 .file-item .rm{color:var(--red); font-weight:700; cursor:pointer; border:none; background:none; font-size:1rem;}
 .progress{height:8px; background:#e9e4f6; border-radius:99px; overflow:hidden; margin-top:16px; display:none;}
 .progress i{display:block; height:100%; width:0; background:linear-gradient(90deg,var(--violet),var(--fuchsia)); transition:width .2s;}
-.btn{width:100%; margin-top:20px; padding:15px; border:none; border-radius:14px; background:linear-gradient(135deg,var(--violet),var(--fuchsia)); color:#fff; font-size:1.08rem; font-weight:900; font-family:inherit; cursor:pointer; box-shadow:0 6px 18px rgba(124,58,237,.35); transition:transform .1s, opacity .2s;}
+.btn{width:100%; margin-top:20px; padding:15px; border:none; border-radius:14px; background:linear-gradient(135deg,var(--violet),var(--fuchsia)); color:#fff; font-size:1.08rem; font-weight:900; font-family:inherit; cursor:pointer; box-shadow:0 3px 10px rgba(124,58,237,.28); transition:transform .1s, opacity .2s;}
 .btn:active{transform:scale(.98);}
 .btn:disabled{opacity:.55; cursor:default;}
 .err{color:var(--red); font-size:.85rem; font-weight:700; margin-top:10px; display:none;}
@@ -239,6 +236,9 @@ $('f').addEventListener('submit', async (e) => {
     $('note').style.display = 'none';
     $('doneTitle').textContent = 'شكراً فرع ' + br + '!';
     $('doneMsg').textContent = 'شغلكم بيوصّل الخير لكل الناس، ومستنيين منكم الأقوى دايماً';
+    $('note').style.display = 'none';
+    $('doneTitle').textContent = 'شكراً فرع ' + br + '!';
+    $('doneMsg').textContent = 'شغلكم بيوصّل الخير لكل الناس، ومستنيين منكم الأقوى دايماً';
     $('f').style.display = 'none';
     $('done').style.display = 'block';
     window.scrollTo({top:0, behavior:'smooth'});
@@ -251,7 +251,7 @@ $('f').addEventListener('submit', async (e) => {
 });
 
 $('again').addEventListener('click', () => {
-  $('done').style.display = 'none'; $('note').style.display = 'block'; $('note').style.display = 'block';
+  $('done').style.display = 'none'; $('note').style.display = 'block'; $('note').style.display = 'block'; $('note').style.display = 'block';
   const f = $('f'); f.reset(); f.style.display = 'block';
   files = []; renderFiles(); progBar.style.width='0'; prog.style.display='none';
   branchOther.style.display = 'none';

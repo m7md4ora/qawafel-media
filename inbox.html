@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>صندوق الأخبار — الميديا المركزية</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
 <style>
 :root{
@@ -18,7 +18,6 @@ body{background:var(--bg); color:var(--text); min-height:100vh;}
 .hero{
   background:
     radial-gradient(600px 260px at 88% -8%, rgba(192,38,211,.30), transparent 65%),
-    radial-gradient(500px 300px at 8% 108%, rgba(192,38,211,.25), transparent 60%),
     linear-gradient(160deg,#171233 0%, var(--violet-deep) 48%, var(--violet) 100%);
   color:#fff; padding:40px 20px 64px; text-align:center; position:relative; overflow:hidden;
 }
@@ -29,14 +28,12 @@ body{background:var(--bg); color:var(--text); min-height:100vh;}
 .deco .d2{top:16%; left:6%; width:36px;}
 .deco .d3{bottom:26%; right:11%; width:32px;}
 .deco .d4{bottom:30%; left:9%; width:42px;}
-.logos{display:flex; align-items:center; justify-content:center; gap:16px; margin-bottom:16px; position:relative; animation:fadeDown .8s .05s both;}
+.logos{display:flex; align-items:center; justify-content:center; gap:16px; margin-bottom:16px; position:relative;}
 .logos img{height:58px; display:block;}
 .logos .sep{width:1.5px; height:44px; background:linear-gradient(180deg,transparent,rgba(255,255,255,.65),transparent);}
-@keyframes fadeDown{from{opacity:0; transform:translateY(-14px)} to{opacity:1; transform:none}}
-.hero h1{font-size:1.5rem; font-weight:900; letter-spacing:.2px; position:relative; animation:rise .6s .15s ease both; text-shadow:0 2px 14px rgba(0,0,0,.3);}
-.hero .subtitle{color:#e9d5ff; font-weight:700; font-size:.98rem; margin-top:4px; position:relative; animation:rise .6s .25s ease both;}
-.hero p{opacity:.88; font-size:.9rem; margin-top:8px; position:relative; animation:rise .6s .35s ease both;}
-@keyframes rise{from{transform:translateY(14px); opacity:0} to{transform:none; opacity:1}}
+.hero h1{font-size:1.5rem; font-weight:900; letter-spacing:.2px; position:relative;}
+.hero .subtitle{color:#e9d5ff; font-weight:700; font-size:.98rem; margin-top:4px; position:relative;}
+.hero p{opacity:.88; font-size:.9rem; margin-top:8px; position:relative;}
 @keyframes pop{from{transform:scale(.4); opacity:0} to{transform:scale(1); opacity:1}}
 @media (prefers-reduced-motion: reduce){ *,*::before,*::after{animation:none !important; transition:none !important;} }
 
@@ -44,11 +41,11 @@ body{background:var(--bg); color:var(--text); min-height:100vh;}
 .logos img{height:50px;}
 .hero h1{font-size:1.35rem;}
 .wrap{max-width:640px; margin:-30px auto 40px; padding:0 16px; position:relative; z-index:1;}
-.card{background:var(--card); border:1px solid var(--border); border-radius:20px; padding:20px 16px; box-shadow:0 14px 34px rgba(76,29,149,.13); animation:rise .5s .3s ease both;}
+.card{background:var(--card); border:1px solid var(--border); border-radius:20px; padding:20px 16px; box-shadow:0 4px 14px rgba(76,29,149,.12);}
 label{display:block; font-weight:700; font-size:.95rem; margin-bottom:8px;}
 input{width:100%; padding:13px 14px; border:1.5px solid var(--border); border-radius:12px; font-size:1rem; font-family:inherit; background:#fbfaff; color:var(--text);}
 input:focus{outline:none; border-color:var(--violet); box-shadow:0 0 0 3px rgba(124,58,237,.16); background:#fff;}
-.btn{width:100%; margin-top:14px; padding:14px; border:none; border-radius:14px; background:linear-gradient(135deg,var(--violet),var(--fuchsia)); color:#fff; font-size:1.05rem; font-weight:900; font-family:inherit; cursor:pointer; box-shadow:0 6px 18px rgba(124,58,237,.35);}
+.btn{width:100%; margin-top:14px; padding:14px; border:none; border-radius:14px; background:linear-gradient(135deg,var(--violet),var(--fuchsia)); color:#fff; font-size:1.05rem; font-weight:900; font-family:inherit; cursor:pointer; box-shadow:0 3px 10px rgba(124,58,237,.28);}
 .btn:active{transform:scale(.98);}
 .err{color:var(--red); font-size:.85rem; font-weight:700; margin-top:10px; display:none;}
 .stats{display:none; gap:10px; margin-bottom:16px;}
@@ -56,7 +53,7 @@ input:focus{outline:none; border-color:var(--violet); box-shadow:0 0 0 3px rgba(
 .stat{flex:1; background:#f3efff; border:1px solid var(--border); border-radius:12px; padding:10px; text-align:center;}
 .stat b{display:block; color:var(--violet-deep); font-size:1.3rem; font-weight:900;}
 .stat span{font-size:.78rem; color:var(--muted);}
-.sub{background:var(--card); border:1px solid var(--border); border-radius:16px; padding:16px; margin-bottom:14px; box-shadow:0 4px 14px rgba(76,29,149,.08); animation:rise .45s ease both;}
+.sub{background:var(--card); border:1px solid var(--border); border-radius:16px; padding:16px; margin-bottom:14px; box-shadow:0 2px 8px rgba(76,29,149,.08);}
 .sub .top{display:flex; justify-content:space-between; align-items:center; gap:8px; flex-wrap:wrap;}
 .badge{background:linear-gradient(135deg,var(--violet),var(--violet-deep)); color:#fff; border-radius:99px; padding:3px 12px; font-size:.8rem; font-weight:700; white-space:nowrap;}
 .when{color:var(--muted); font-size:.78rem;}
